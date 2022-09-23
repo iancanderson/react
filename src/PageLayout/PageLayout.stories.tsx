@@ -701,7 +701,6 @@ export const ResizablePane: Story = args => (
           regular: args['Pane.position.regular'],
           wide: args['Pane.position.wide']
         }}
-        divider="line"
         canResizePane={true}
         paneWidthStorageKey="primer-react.pane-width"
       >

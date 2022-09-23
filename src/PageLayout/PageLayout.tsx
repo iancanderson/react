@@ -184,14 +184,7 @@ const verticalDividerVariants = {
   }
 }
 
-const VerticalDivider: React.FC<React.PropsWithChildren<DividerProps>> = ({
-  variant = 'none',
-  canResize,
-  isResizing,
-  onClick,
-  onMouseDown,
-  sx = {}
-}) => {
+const VerticalDivider: React.FC<React.PropsWithChildren<DividerProps>> = ({variant = 'none', sx = {}}) => {
   const responsiveVariant = useResponsiveValue(variant, 'none')
   return (
     <Box
@@ -203,45 +196,66 @@ const VerticalDivider: React.FC<React.PropsWithChildren<DividerProps>> = ({
         },
         sx
       )}
+    ></Box>
+  )
+}
+
+// ----------------------------------------------------------------------------
+// ResizeHandle (internal)
+
+type ResizeHandleProps = {
+  isResizing: boolean
+  onClick: (e: React.MouseEvent) => void
+  onMouseDown: (e: React.MouseEvent) => void
+} & SxProp
+
+const ResizeHandle: React.FC<React.PropsWithChildren<ResizeHandleProps>> = ({isResizing, onClick, onMouseDown, sx}) => {
+  return (
+    <Box
+      sx={merge<BetterSystemStyleObject>(
+        {
+          height: '100%',
+          position: 'relative'
+        },
+        sx
+      )}
     >
-      {canResize && (
-        <Box
-          onMouseDown={onMouseDown}
-          onClick={onClick}
-          sx={{
-            width: '16px',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            position: 'absolute',
-            transform: 'translateX(50%)',
-            right: 0,
-            opacity: isResizing ? 1 : 0,
-            cursor: 'col-resize',
-            '&:hover': {
-              animation: isResizing ? 'none' : 'resizer-appear 80ms 300ms both',
+      <Box
+        onMouseDown={onMouseDown}
+        onClick={onClick}
+        sx={{
+          width: '16px',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          position: 'absolute',
+          transform: 'translateX(50%)',
+          right: 0,
+          opacity: isResizing ? 1 : 0,
+          cursor: 'col-resize',
+          '&:hover': {
+            animation: isResizing ? 'none' : 'resizer-appear 80ms 300ms both',
 
-              '@keyframes resizer-appear': {
-                from: {
-                  opacity: 0
-                },
+            '@keyframes resizer-appear': {
+              from: {
+                opacity: 0
+              },
 
-                to: {
-                  opacity: 1
-                }
+              to: {
+                opacity: 1
               }
             }
+          }
+        }}
+      >
+        <Box
+          sx={{
+            backgroundColor: 'accent.fg',
+            width: '1px',
+            height: '100%'
           }}
-        >
-          <Box
-            sx={{
-              backgroundColor: 'accent.fg',
-              width: '1px',
-              height: '100%'
-            }}
-          />
-        </Box>
-      )}
+        />
+      </Box>
     </Box>
   )
 }
@@ -567,6 +581,14 @@ const Pane = React.forwardRef<HTMLDivElement, React.PropsWithChildren<PageLayout
           onMouseDown={onMouseDown}
           sx={{[position === 'end' ? 'marginRight' : 'marginLeft']: SPACING_MAP[columnGap]}}
         />
+        {canResizePane && (
+          <ResizeHandle
+            isResizing={isResizing}
+            onClick={onClick}
+            onMouseDown={onMouseDown}
+            sx={{[position === 'end' ? 'marginRight' : 'marginLeft']: SPACING_MAP[columnGap]}}
+          />
+        )}
         <Box
           ref={paneRef}
           sx={(theme: Theme) => ({
